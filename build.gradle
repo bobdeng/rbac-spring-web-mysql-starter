@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'jacoco'
+}
+group 'cn.bobdeng.base'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+apply from: "$rootDir/gradle/config/script/style.gradle"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'cn.bobdeng.base'
+            artifactId = 'rbac-spring-web-mysql-starter'
+            version = '0.1'
+            from components.java
+        }
+    }
+}
+apply from: "$rootDir/gradle/config/script/junit.gradle"
+apply from: "$rootDir/gradle/config/script/spring.gradle"
+apply from: "$rootDir/gradle/config/script/testcontainer.gradle"
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.18.20"
+    implementation "com.google.code.gson:gson:2.8.5"
+    testImplementation 'mysql:mysql-connector-java:8.0.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testImplementation 'com.github.bobdeng:dummydao:1.2'
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+apply from: "$rootDir/gradle/config/script/coverage-all.gradle"

@@ -1,0 +1,4 @@
+dependencies {
+    testImplementation 'org.testcontainers:mysql:1.15.2'
+    testImplementation 'org.testcontainers:testcontainers:1.15.2'
+}
