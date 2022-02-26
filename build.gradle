@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
     id 'jacoco'
 }
@@ -28,7 +28,7 @@ apply from: "$rootDir/gradle/config/script/testcontainer.gradle"
 dependencies {
     compileOnly "org.projectlombok:lombok:1.18.20"
     implementation "com.google.code.gson:gson:2.8.5"
-    implementation 'com.github.bobdeng:rbac-spring-mysql-impl:0.1.1'
+    api 'com.github.bobdeng:rbac-spring-mysql-impl:0.2.2'
     testImplementation 'org.flywaydb:flyway-core:5.2.4'
     testImplementation 'mysql:mysql-connector-java:8.0.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
