@@ -7,13 +7,21 @@ import cn.bobdeng.base.rbac.repository.UserDAO;
 import cn.bobdeng.base.rbac.repository.UserDO;
 import cn.bobdeng.base.user.TenantId;
 import cn.bobdeng.base.user.UserId;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 public class ListUserControllerTest extends IntegrationTest {
     public static final String TENANT_ID = "10000";
@@ -23,17 +31,25 @@ public class ListUserControllerTest extends IntegrationTest {
     UserDAO userDAO;
     @Autowired
     PermissionSessionUserGetter permissionSessionUserGetter;
+    @Autowired
+    MockMvc mockMvc;
     private SessionUser sessionUser = new SessionUser(UserId.of("100"), TenantId.of(TENANT_ID));
 
     @Test
-    public void should_return_empty_when_has_no_user() {
+    public void should_return_empty_when_has_no_user() throws Exception {
         permissionSessionUserGetter.setSessionUser(sessionUser);
-        List list = listUserController.listUser();
-        assertThat(list.isEmpty(), is(true));
+        MvcResult mvcResult = listUser();
+        JSONAssert.assertEquals(mvcResult.getResponse().getContentAsString(), "[]", true);
+    }
+
+    private MvcResult listUser() throws Exception {
+        return mockMvc.perform(get("/rbac/users")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
     }
 
     @Test
-    public void should_return_empty_when_has_has_1_user() {
+    public void should_return_users_when_has_has_1_user() throws Exception {
         permissionSessionUserGetter.setSessionUser(sessionUser);
         userDAO.save(UserDO.builder()
                 .id("123")
@@ -42,8 +58,14 @@ public class ListUserControllerTest extends IntegrationTest {
                 .level("user")
                 .status("active")
                 .build());
+        UserVO userVO = new UserVO();
+        userVO.setId("123");
+        userVO.setLevel("user");
+        userVO.setName("张三");
+        userVO.setStatus("active");
+        String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
 
-        List list = listUserController.listUser();
-        assertThat(list.size(), is(1));
+        JSONAssert.assertEquals(listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), expectJsonResult, true);
+
     }
 }

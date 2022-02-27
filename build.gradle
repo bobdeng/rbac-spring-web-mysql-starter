@@ -28,8 +28,9 @@ apply from: "$rootDir/gradle/config/script/testcontainer.gradle"
 dependencies {
     compileOnly "org.projectlombok:lombok:1.18.20"
     implementation "com.google.code.gson:gson:2.8.5"
-    api 'com.github.bobdeng:rbac-spring-mysql-impl:0.2.2'
+    api 'com.github.bobdeng:rbac-spring-mysql-impl:0.3.0'
     testImplementation 'org.flywaydb:flyway-core:5.2.4'
+    testImplementation 'com.squareup.okhttp3:okhttp:3.10.0'
     testImplementation 'mysql:mysql-connector-java:8.0.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
     testImplementation 'com.github.bobdeng:dummydao:1.2'
