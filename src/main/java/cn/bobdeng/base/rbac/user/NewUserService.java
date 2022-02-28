@@ -16,7 +16,7 @@ public class NewUserService {
         this.currentUser = currentUser;
     }
 
-    @Permission(admin = true)
+    @Permission(allow = "user.create")
     public UserIdVO execute(UserName name) {
         User user = Users.ofTenant(currentUser.tenantId()).newUser(name);
         return new UserIdVO(user.id());

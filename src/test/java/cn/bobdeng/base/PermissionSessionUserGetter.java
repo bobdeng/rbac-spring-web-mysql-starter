@@ -3,6 +3,7 @@ package cn.bobdeng.base;
 import cn.bobdeng.base.rbac.permission.PermissionSessionGetter;
 import cn.bobdeng.base.rbac.permission.SessionUser;
 import cn.bobdeng.base.user.TenantId;
+import cn.bobdeng.base.user.User;
 import cn.bobdeng.base.user.UserId;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,9 @@ public class PermissionSessionUserGetter implements PermissionSessionGetter {
 
     public void init() {
         this.sessionUser = new SessionUser(UserId.of(USER_ID), TenantId.of(TENANT_ID));
+    }
+
+    public void init(User user) {
+        this.sessionUser = new SessionUser(user.getId(), TenantId.of(TENANT_ID));
     }
 }
