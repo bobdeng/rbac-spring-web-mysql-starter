@@ -1,4 +1,4 @@
-package cn.bobdeng.base.rbac;
+package cn.bobdeng.base.rbac.user;
 
 import cn.bobdeng.base.rbac.permission.PermissionSessionGetter;
 import cn.bobdeng.base.rbac.permission.SessionUser;

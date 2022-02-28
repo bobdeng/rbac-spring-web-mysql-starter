@@ -6,6 +6,8 @@ import cn.bobdeng.base.rbac.permission.SessionUser;
 import cn.bobdeng.base.rbac.repository.UserAccountDAO;
 import cn.bobdeng.base.rbac.repository.UserDAO;
 import cn.bobdeng.base.rbac.repository.UserDO;
+import cn.bobdeng.base.rbac.user.NewUserForm;
+import cn.bobdeng.base.rbac.user.UserIdVO;
 import cn.bobdeng.base.user.TenantId;
 import cn.bobdeng.base.user.User;
 import cn.bobdeng.base.user.Users;
@@ -15,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -69,6 +70,18 @@ public class NewUserControllerTest extends IntegrationTest {
         assertThat(users.get(0).getStatus(), is("active"));
         assertThat(users.get(0).getName(), is("张三"));
         assertThat(users.get(0).getLevel(), is("user"));
-        assertThat(userId.getId().isBlank(), is(users.get(0).getId()));
+        assertThat(userId.getId(), is(users.get(0).getId()));
+    }
+
+    @Test
+    public void should_has_throw_user_when_has_no_permission() throws Exception {
+        permissionSessionUserGetter.init();
+        NewUserForm form = new NewUserForm();
+        form.setName("张三");
+        mockMvc.perform(post("/rbac/users")
+                .content(new Gson().toJson(form))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isForbidden()).andReturn()
+                .getResponse().getContentAsString(StandardCharsets.UTF_8);
     }
 }

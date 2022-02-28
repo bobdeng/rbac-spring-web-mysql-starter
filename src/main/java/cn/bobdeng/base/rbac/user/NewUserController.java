@@ -1,4 +1,4 @@
-package cn.bobdeng.base.rbac;
+package cn.bobdeng.base.rbac.user;
 
 import cn.bobdeng.base.user.UserName;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,4 +18,5 @@ public class NewUserController {
         UserName name = new UserName(form.getName());
         return newUserService.execute(name);
     }
+
 }

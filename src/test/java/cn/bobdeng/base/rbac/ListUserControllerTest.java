@@ -5,6 +5,8 @@ import cn.bobdeng.base.PermissionSessionUserGetter;
 import cn.bobdeng.base.rbac.permission.SessionUser;
 import cn.bobdeng.base.rbac.repository.UserDAO;
 import cn.bobdeng.base.rbac.repository.UserDO;
+import cn.bobdeng.base.rbac.user.ListUserController;
+import cn.bobdeng.base.rbac.user.UserVO;
 import cn.bobdeng.base.user.TenantId;
 import cn.bobdeng.base.user.UserId;
 import com.google.gson.Gson;
@@ -17,7 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

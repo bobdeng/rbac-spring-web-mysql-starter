@@ -1,8 +1,7 @@
-package cn.bobdeng.base.rbac;
+package cn.bobdeng.base.rbac.user;
 
 import cn.bobdeng.base.rbac.permission.Permission;
 import cn.bobdeng.base.rbac.permission.PermissionSessionGetter;
-import cn.bobdeng.base.rbac.permission.SessionUser;
 import cn.bobdeng.base.user.TenantId;
 import cn.bobdeng.base.user.User;
 import cn.bobdeng.base.user.UserName;
@@ -11,16 +10,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NewUserService {
-    private PermissionSessionGetter permissionSessionGetter;
+    private CurrentUser currentUser;
 
-    public NewUserService(PermissionSessionGetter permissionSessionGetter) {
-        this.permissionSessionGetter = permissionSessionGetter;
+    public NewUserService(CurrentUser currentUser) {
+        this.currentUser = currentUser;
     }
 
     @Permission(admin = true)
     public UserIdVO execute(UserName name) {
-        TenantId tenantId = permissionSessionGetter.sessionUser().map(SessionUser::getTenantId).orElse(null);
-        User user = Users.ofTenant(tenantId).newUser(name);
+        User user = Users.ofTenant(currentUser.tenantId()).newUser(name);
         return new UserIdVO(user.id());
     }
 }
