@@ -16,8 +16,8 @@ public class SetUserAccountController {
     }
 
     @PutMapping("/rbac/user/{id}/account")
-    public void setUserAccount(@PathVariable String id, @RequestBody SetUserAccountForm form) {
+    public void setUserAccount(@PathVariable int id, @RequestBody SetUserAccountForm form) {
         Account account = new Account(form.getAccount());
-        setUserAccountService.execute(UserId.of(id), account);
+        setUserAccountService.execute(new UserId(id), account);
     }
 }

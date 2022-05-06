@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class UserIdVO {
-    private String id;
+    private int id;
 
-    public UserIdVO(String id) {
+    public UserIdVO(int id) {
         this.id = id;
     }
 }

@@ -1,6 +1,5 @@
 package cn.bobdeng.base.rbac.user;
 
-import cn.bobdeng.base.rbac.permission.PermissionDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

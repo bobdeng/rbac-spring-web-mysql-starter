@@ -2,12 +2,12 @@ package cn.bobdeng.base.rbac;
 
 import cn.bobdeng.base.IntegrationTest;
 import cn.bobdeng.base.PermissionSessionUserGetter;
-import cn.bobdeng.base.rbac.permission.SessionUser;
-import cn.bobdeng.base.rbac.repository.UserDAO;
-import cn.bobdeng.base.rbac.repository.UserDO;
+import cn.bobdeng.base.SessionUser;
+import cn.bobdeng.base.TenantId;
+import cn.bobdeng.base.rbac.repos.UserDAO;
 import cn.bobdeng.base.rbac.user.ListUserController;
 import cn.bobdeng.base.rbac.user.UserVO;
-import cn.bobdeng.base.user.TenantId;
+import cn.bobdeng.base.user.UserDO;
 import cn.bobdeng.base.user.UserId;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 public class ListUserControllerTest extends IntegrationTest {
@@ -34,7 +32,7 @@ public class ListUserControllerTest extends IntegrationTest {
     PermissionSessionUserGetter permissionSessionUserGetter;
     @Autowired
     MockMvc mockMvc;
-    private SessionUser sessionUser = new SessionUser(UserId.of("100"), TenantId.of(TENANT_ID));
+    private SessionUser sessionUser = new SessionUser(new UserId(1), new TenantId(TENANT_ID));
 
     @Test
     public void should_return_empty_when_has_no_user() throws Exception {
@@ -45,7 +43,7 @@ public class ListUserControllerTest extends IntegrationTest {
 
     private MvcResult listUser() throws Exception {
         return mockMvc.perform(get("/rbac/users")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
     }
 
@@ -53,17 +51,13 @@ public class ListUserControllerTest extends IntegrationTest {
     public void should_return_users_when_has_has_1_user() throws Exception {
         permissionSessionUserGetter.setSessionUser(sessionUser);
         userDAO.save(UserDO.builder()
-                .id("123")
+                .id(1)
                 .tenantId(TENANT_ID)
                 .name("张三")
-                .level("user")
-                .status("active")
                 .build());
         UserVO userVO = new UserVO();
         userVO.setId("123");
-        userVO.setLevel("user");
         userVO.setName("张三");
-        userVO.setStatus("active");
         String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
 
         JSONAssert.assertEquals(listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), expectJsonResult, true);

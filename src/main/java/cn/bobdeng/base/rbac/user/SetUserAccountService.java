@@ -1,23 +1,23 @@
 package cn.bobdeng.base.rbac.user;
 
-import cn.bobdeng.base.rbac.permission.Permission;
-import cn.bobdeng.base.user.Account;
-import cn.bobdeng.base.user.User;
-import cn.bobdeng.base.user.UserId;
-import cn.bobdeng.base.user.Users;
+import cn.bobdeng.base.user.*;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SetUserAccountService {
     private CurrentUser currentUser;
+    private final UserRepository userRepository;
+    private final UserAccountRepository userAccountRepository;
 
-    public SetUserAccountService(CurrentUser currentUser) {
+    public SetUserAccountService(CurrentUser currentUser, UserRepository userRepository, UserAccountRepository userAccountRepository) {
         this.currentUser = currentUser;
+        this.userRepository = userRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @Permission(allow = "user.setAccount")
     public void execute(UserId userId, Account account) {
-        User user = Users.userRepository.findById(currentUser.tenantId(), userId).orElseThrow();
-        user.bindAccount(account);
+        User user = userRepository.findById(userId).orElseThrow();
+        user.bindAccount(new Account(account.name()), userAccountRepository);
     }
 }

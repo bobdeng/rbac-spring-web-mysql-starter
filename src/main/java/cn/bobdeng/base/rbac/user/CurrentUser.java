@@ -1,8 +1,8 @@
 package cn.bobdeng.base.rbac.user;
 
-import cn.bobdeng.base.rbac.permission.PermissionSessionGetter;
-import cn.bobdeng.base.rbac.permission.SessionUser;
-import cn.bobdeng.base.user.TenantId;
+import cn.bobdeng.base.PermissionSessionGetter;
+import cn.bobdeng.base.SessionUser;
+import cn.bobdeng.base.TenantId;
 import org.springframework.stereotype.Service;
 
 @Service

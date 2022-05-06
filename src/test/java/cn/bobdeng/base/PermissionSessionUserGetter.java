@@ -1,8 +1,5 @@
 package cn.bobdeng.base;
 
-import cn.bobdeng.base.rbac.permission.PermissionSessionGetter;
-import cn.bobdeng.base.rbac.permission.SessionUser;
-import cn.bobdeng.base.user.TenantId;
 import cn.bobdeng.base.user.User;
 import cn.bobdeng.base.user.UserId;
 import lombok.Setter;
@@ -13,7 +10,7 @@ import java.util.Optional;
 @Service
 public class PermissionSessionUserGetter implements PermissionSessionGetter {
     public static final String TENANT_ID = "10000";
-    public static final String USER_ID = "100";
+    public static final Integer USER_ID = 100;
 
     @Setter
     private SessionUser sessionUser;
@@ -24,10 +21,10 @@ public class PermissionSessionUserGetter implements PermissionSessionGetter {
     }
 
     public void init() {
-        this.sessionUser = new SessionUser(UserId.of(USER_ID), TenantId.of(TENANT_ID));
+        this.sessionUser = new SessionUser(new UserId(USER_ID), new TenantId(TENANT_ID));
     }
 
     public void init(User user) {
-        this.sessionUser = new SessionUser(user.getId(), TenantId.of(TENANT_ID));
+        this.sessionUser = new SessionUser(user.getId(), new TenantId(TENANT_ID));
     }
 }

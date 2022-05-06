@@ -1,24 +1,22 @@
 package cn.bobdeng.base.rbac.user;
 
-import cn.bobdeng.base.rbac.permission.Permission;
-import cn.bobdeng.base.rbac.permission.PermissionSessionGetter;
-import cn.bobdeng.base.user.TenantId;
-import cn.bobdeng.base.user.User;
-import cn.bobdeng.base.user.UserName;
-import cn.bobdeng.base.user.Users;
+import cn.bobdeng.base.user.*;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NewUserService {
     private CurrentUser currentUser;
+    private final UserRepository userRepository;
 
-    public NewUserService(CurrentUser currentUser) {
+    public NewUserService(CurrentUser currentUser, UserRepository userRepository) {
         this.currentUser = currentUser;
+        this.userRepository = userRepository;
     }
 
     @Permission(allow = "user.create")
-    public UserIdVO execute(UserName name) {
-        User user = Users.ofTenant(currentUser.tenantId()).newUser(name);
+    public UserIdVO execute(String name) throws UserAlreadyExistException {
+        NewUserRequest request = new NewUserRequest(name);
+        User user = new Users(currentUser.tenantId()).newUser(request, userRepository);
         return new UserIdVO(user.id());
     }
 }
