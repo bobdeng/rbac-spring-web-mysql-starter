@@ -72,6 +72,14 @@ public abstract class IntegrationTest {
         }
     }
 
+    protected void setPermission(List<String> functions) {
+        try {
+            userPermissionSetter.setPermission(functions);
+        } catch (RoleAlreadyExistException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected List<String> tablesNeedClear() {
         return Collections.emptyList();
     }

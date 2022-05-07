@@ -1,14 +1,1 @@
-[
-  {
-    "id": 1,
-    "name": "test",
-    "functions": "[\"rbac.role.create\"]",
-    "tenantId": "10000"
-  },
-  {
-    "id": 2,
-    "name": "新角色",
-    "functions": "[\"rbac.user.create\"]",
-    "tenantId": "10000"
-  }
-]
+[{"id":1,"name":"test","functions":"[\"rbac.role.create\",\"rbac.role.update\"]","tenantId":"10000"},{"id":2,"name":"新角色","functions":"[\"rbac.user.create\"]","tenantId":"10000"}]

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,13 +24,18 @@ public class UserPermissionSetter {
     UserRoleRepository userRoleRepository;
 
     public void setPermission(String functionName) throws RoleAlreadyExistException {
+        this.setPermission(Arrays.asList(functionName));
+    }
+
+    public void setPermission(List<String> functions) throws RoleAlreadyExistException {
         String roleName = "test";
         TenantId tenantId = permissionSessionUserGetter.sessionUser().map(SessionUser::getTenantId).orElse(null);
         Roles roles = new Roles(tenantId);
-        Role role = new Role(new RoleName(roleName), new RoleFunctions(Arrays.asList(functionName)));
+        Role role = new Role(new RoleName(roleName), new RoleFunctions(functions));
         roles.saveRole(role, roleRepository);
         UserId userId = permissionSessionUserGetter.sessionUser().map(SessionUser::getUserId).orElse(null);
         User user = userRepository.findById(userId).orElseThrow();
         user.setRoles(Arrays.asList(roleName), userRoleRepository);
+
     }
 }
