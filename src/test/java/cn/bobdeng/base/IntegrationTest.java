@@ -64,6 +64,10 @@ public abstract class IntegrationTest {
         permissionSessionUserGetter.setSessionUser(new SessionUser(new UserId(admin.getId()), tenantId));
     }
 
+    protected SessionUser getSessionUser(){
+        return permissionSessionUserGetter.sessionUser().orElse(null);
+    }
+
     protected void setPermission(String function) {
         try {
             userPermissionSetter.setPermission(function);
