@@ -2,8 +2,6 @@ package cn.bobdeng.base.rbac;
 
 import cn.bobdeng.base.IntegrationTest;
 import cn.bobdeng.base.PermissionSessionUserGetter;
-import cn.bobdeng.base.SessionUser;
-import cn.bobdeng.base.TenantId;
 import cn.bobdeng.base.rbac.repos.RoleDAO;
 import cn.bobdeng.base.rbac.repos.UserAccountDAO;
 import cn.bobdeng.base.rbac.repos.UserDAO;
@@ -11,21 +9,18 @@ import cn.bobdeng.base.rbac.repos.UserRoleDAO;
 import cn.bobdeng.base.rbac.user.NewUserForm;
 import cn.bobdeng.base.rbac.user.UserIdVO;
 import cn.bobdeng.base.role.RoleAlreadyExistException;
-import cn.bobdeng.base.user.*;
+import cn.bobdeng.base.user.UserDO;
 import com.google.gson.Gson;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,27 +41,18 @@ public class NewUserControllerTest extends IntegrationTest {
     UserPermissionSetter userPermissionSetter;
 
     @BeforeEach
-    public void setup() {
-        super.setup();
+    public void setup() throws RoleAlreadyExistException {
         userDAO.deleteAll();
         userAccountDAO.deleteAll();
         userRoleDAO.deleteAll();
         roleDAO.deleteAll();
-    }
-
-    public void initAdmin() throws RoleAlreadyExistException {
-        TenantId tenantId = new TenantId(PermissionSessionUserGetter.TENANT_ID);
-        UserDO admin = userDAO.save(UserDO.builder()
-                .name("admin")
-                .tenantId(tenantId.id())
-                .build());
-        permissionSessionUserGetter.setSessionUser(new SessionUser(new UserId(admin.getId()), tenantId));
-        userPermissionSetter.setPermission("user.create");
+        super.setup();
+        super.setSessionUser();
     }
 
     @Test
     public void should_has_1_user_when_new_user() throws Exception {
-        initAdmin();
+        super.setPermission("rbac.user.create");
         NewUserForm form = new NewUserForm();
         form.setName("李四");
         String result = mockMvc.perform(post("/rbac/users")

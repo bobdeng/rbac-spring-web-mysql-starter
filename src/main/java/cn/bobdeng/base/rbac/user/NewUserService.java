@@ -13,7 +13,7 @@ public class NewUserService {
         this.userRepository = userRepository;
     }
 
-    @Permission(allow = "user.create")
+    @Permission(allow = "rbac.user.create")
     public UserIdVO execute(String name) throws UserAlreadyExistException {
         NewUserRequest request = new NewUserRequest(name);
         User user = new Users(currentUser.tenantId()).newUser(request, userRepository);

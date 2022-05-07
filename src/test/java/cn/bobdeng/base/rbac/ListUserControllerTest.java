@@ -4,12 +4,16 @@ import cn.bobdeng.base.IntegrationTest;
 import cn.bobdeng.base.PermissionSessionUserGetter;
 import cn.bobdeng.base.SessionUser;
 import cn.bobdeng.base.TenantId;
+import cn.bobdeng.base.rbac.repos.UserAccountDAO;
 import cn.bobdeng.base.rbac.repos.UserDAO;
 import cn.bobdeng.base.rbac.user.ListUserController;
 import cn.bobdeng.base.rbac.user.UserVO;
+import cn.bobdeng.base.role.RoleAlreadyExistException;
+import cn.bobdeng.base.user.AccountDO;
 import cn.bobdeng.base.user.UserDO;
 import cn.bobdeng.base.user.UserId;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +33,19 @@ public class ListUserControllerTest extends IntegrationTest {
     @Autowired
     UserDAO userDAO;
     @Autowired
-    PermissionSessionUserGetter permissionSessionUserGetter;
+    UserAccountDAO userAccountDAO;
     @Autowired
-    MockMvc mockMvc;
+    PermissionSessionUserGetter permissionSessionUserGetter;
     private SessionUser sessionUser = new SessionUser(new UserId(1), new TenantId(TENANT_ID));
+
+    @BeforeEach
+    public void setup() throws RoleAlreadyExistException {
+        super.setup();
+        permissionSessionUserGetter.setSessionUser(sessionUser);
+    }
 
     @Test
     public void should_return_empty_when_has_no_user() throws Exception {
-        permissionSessionUserGetter.setSessionUser(sessionUser);
         MvcResult mvcResult = listUser();
         JSONAssert.assertEquals(mvcResult.getResponse().getContentAsString(), "[]", true);
     }
@@ -49,17 +58,22 @@ public class ListUserControllerTest extends IntegrationTest {
 
     @Test
     public void should_return_users_when_has_has_1_user() throws Exception {
-        permissionSessionUserGetter.setSessionUser(sessionUser);
+        userAccountDAO.save(AccountDO.builder()
+                .id(1)
+                .tenantId(TENANT_ID)
+                .name("zhangsan")
+                .build());
         userDAO.save(UserDO.builder()
                 .id(1)
                 .tenantId(TENANT_ID)
                 .name("张三")
                 .build());
-        UserVO userVO = new UserVO();
-        userVO.setId("123");
-        userVO.setName("张三");
-        String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
 
+        UserVO userVO = new UserVO();
+        userVO.setId(1);
+        userVO.setName("张三");
+        userVO.setAccount("zhangsan");
+        String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
         JSONAssert.assertEquals(listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), expectJsonResult, true);
 
     }

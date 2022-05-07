@@ -3,17 +3,22 @@ package cn.bobdeng.base.rbac;
 import cn.bobdeng.base.IntegrationTest;
 import cn.bobdeng.base.PermissionSessionUserGetter;
 import cn.bobdeng.base.TenantId;
+import cn.bobdeng.base.rbac.repos.UserAccountDAO;
+import cn.bobdeng.base.rbac.repos.UserDAO;
 import cn.bobdeng.base.rbac.user.SetUserAccountForm;
 import cn.bobdeng.base.role.*;
 import cn.bobdeng.base.user.*;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
+import static cn.bobdeng.base.PermissionSessionUserGetter.TENANT_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -21,41 +26,58 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class SetUserAccountControllerTest extends IntegrationTest {
     @Autowired
-    MockMvc mockMvc;
-    @Autowired
     PermissionSessionUserGetter permissionSessionUserGetter;
+    @Autowired
+    UserPermissionSetter userPermissionSetter;
+    @Autowired
+    UserDAO userDAO;
+    @Autowired
+    UserAccountDAO userAccountDAO;
+
+    @BeforeEach
+    public void setup() throws RoleAlreadyExistException {
+        super.setup();
+        super.setSessionUser();
+    }
+
+    @Override
+    protected List<String> tablesNeedClear() {
+        return List.of("rbac_user", "rbac_account", "rbac_role", "rbac_user_role");
+    }
 
     @Test
     public void should_bind_account_when_set_account() throws Exception {
-       /* Role role = new Roles(new TenantId(PermissionSessionUserGetter.TENANT_ID)).newRole(new RoleName(""), new Functions(Arrays.asList(function)));
-        User user = getUsers().newUser(UserName.empty());
-        user.setRoles(new UserRoles(Arrays.asList(role.getId())));
-        permissionSessionUserGetter.init(user);
-
+        userPermissionSetter.setPermission("rbac.user.set_account");
         SetUserAccountForm form = new SetUserAccountForm();
         form.setAccount("zhangsan");
-        mockMvc.perform(put("/rbac/user/" + user.id() + "/account")
+        UserDO zhangsan = createZhangsan();
+        mockMvc.perform(put("/rbac/user/" + zhangsan.getId() + "/account")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new Gson().toJson(form))
         ).andExpect(status().isOk());
-        UserId userId = Users.accountRepository.findUserByAccount(new Account(form.getAccount())).orElse(null);
-        assertThat(userId, is(user.getId()));*/
+        AccountDO accountOfZhangsan = userAccountDAO.findById(zhangsan.getId()).orElseThrow();
+        assertThat(accountOfZhangsan.getName(), is("zhangsan"));
+        assertThat(accountOfZhangsan.getTenantId(), is(TENANT_ID));
     }
 
-    /*@Test
+    private UserDO createZhangsan() {
+        UserDO zhangsan = userDAO.save(UserDO.builder()
+                .tenantId(TENANT_ID)
+                .name("张三")
+                .build());
+        return zhangsan;
+    }
+
+    @Test
     public void should_no_permission_when_set_account_has_no_role() throws Exception {
-        permissionSessionUserGetter.init();
-        User user = getUsers().newUser(UserName.empty());
+        UserDO zhangsan = createZhangsan();
         SetUserAccountForm form = new SetUserAccountForm();
         form.setAccount("zhangsan");
-        mockMvc.perform(put("/rbac/user/" + user.id() + "/account")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new Gson().toJson(form))
-        )
+        mockMvc.perform(put("/rbac/user/" + zhangsan.getId() + "/account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new Gson().toJson(form))
+                )
                 .andExpect(status().isForbidden());
     }
 
-    private Users getUsers() {
-        return new Users(TenantId.of(PermissionSessionUserGetter.TENANT_ID));
-    }*/
 }

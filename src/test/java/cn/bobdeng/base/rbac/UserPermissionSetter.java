@@ -23,12 +23,13 @@ public class UserPermissionSetter {
     UserRoleRepository userRoleRepository;
 
     public void setPermission(String functionName) throws RoleAlreadyExistException {
+        String roleName = "test";
         TenantId tenantId = permissionSessionUserGetter.sessionUser().map(SessionUser::getTenantId).orElse(null);
         Roles roles = new Roles(tenantId);
-        Role role = new Role(new RoleName("test"), new RoleFunctions(Arrays.asList(functionName)));
+        Role role = new Role(new RoleName(roleName), new RoleFunctions(Arrays.asList(functionName)));
         roles.saveRole(role, roleRepository);
         UserId userId = permissionSessionUserGetter.sessionUser().map(SessionUser::getUserId).orElse(null);
         User user = userRepository.findById(userId).orElseThrow();
-        user.setRoles(Arrays.asList("test"), userRoleRepository);
+        user.setRoles(Arrays.asList(roleName), userRoleRepository);
     }
 }

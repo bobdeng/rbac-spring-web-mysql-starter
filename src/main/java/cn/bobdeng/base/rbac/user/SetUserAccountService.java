@@ -15,7 +15,7 @@ public class SetUserAccountService {
         this.userAccountRepository = userAccountRepository;
     }
 
-    @Permission(allow = "user.setAccount")
+    @Permission(allow = "rbac.user.set_account")
     public void execute(UserId userId, Account account) {
         User user = userRepository.findById(userId).orElseThrow();
         user.bindAccount(new Account(account.name()), userAccountRepository);
