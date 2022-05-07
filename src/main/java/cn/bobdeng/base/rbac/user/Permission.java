@@ -8,7 +8,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Permission {
-    String[] allow() default {};
-
-    boolean admin() default false;
+    String[] value() default {};
 }

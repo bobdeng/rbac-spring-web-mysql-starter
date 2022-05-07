@@ -15,6 +15,7 @@ public class SetPasswordService {
         this.passwordRepository = passwordRepository;
     }
 
+    @Permission("rbac.user.set_password")
     public void execute(UserId userId, Password password) {
         userRepository.findById(userId)
                 .ifPresent(user -> user.setPassword(password, passwordRepository));

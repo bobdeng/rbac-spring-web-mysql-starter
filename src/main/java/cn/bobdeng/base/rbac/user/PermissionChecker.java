@@ -27,7 +27,7 @@ public class PermissionChecker {
     @Before("@annotation(permission)")
     public void before(Permission permission) {
         User user = getCurrentUser();
-        if (!user.hasAnyPermission(Arrays.asList(permission.allow()), userRoleRepository)) {
+        if (!user.hasAnyPermission(Arrays.asList(permission.value()), userRoleRepository)) {
             throw new PermissionDeniedException();
         }
     }

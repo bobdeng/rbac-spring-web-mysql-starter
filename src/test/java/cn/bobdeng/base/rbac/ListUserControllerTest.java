@@ -63,14 +63,14 @@ public class ListUserControllerTest extends IntegrationTest {
                 .tenantId(TENANT_ID)
                 .name("zhangsan")
                 .build());
-        userDAO.save(UserDO.builder()
+        UserDO userDO = userDAO.save(UserDO.builder()
                 .id(1)
                 .tenantId(TENANT_ID)
                 .name("张三")
                 .build());
 
         UserVO userVO = new UserVO();
-        userVO.setId(1);
+        userVO.setId(userDO.getId());
         userVO.setName("张三");
         userVO.setAccount("zhangsan");
         String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
