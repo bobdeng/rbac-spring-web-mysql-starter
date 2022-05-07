@@ -29,7 +29,7 @@ public class SetUserPasswordTest extends IntegrationTest {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @BeforeEach
-    public void setup() throws RoleAlreadyExistException {
+    public void setup() {
         super.setup();
         super.setSessionUser();
         super.setPermission("rbac.user.set_password");

@@ -21,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -36,10 +38,12 @@ public class ListUserControllerTest extends IntegrationTest {
     UserAccountDAO userAccountDAO;
     @Autowired
     PermissionSessionUserGetter permissionSessionUserGetter;
+    @Autowired
+    EntityManager entityManager;
     private SessionUser sessionUser = new SessionUser(new UserId(1), new TenantId(TENANT_ID));
 
     @BeforeEach
-    public void setup() throws RoleAlreadyExistException {
+    public void setup() {
         super.setup();
         permissionSessionUserGetter.setSessionUser(sessionUser);
     }
@@ -58,23 +62,22 @@ public class ListUserControllerTest extends IntegrationTest {
 
     @Test
     public void should_return_users_when_has_has_1_user() throws Exception {
-        userAccountDAO.save(AccountDO.builder()
-                .id(1)
-                .tenantId(TENANT_ID)
-                .name("zhangsan")
-                .build());
         UserDO userDO = userDAO.save(UserDO.builder()
-                .id(1)
                 .tenantId(TENANT_ID)
                 .name("张三")
                 .build());
-
+        userAccountDAO.save(AccountDO.builder()
+                .id(userDO.getId())
+                .tenantId(TENANT_ID)
+                .name("zhangsan")
+                .build());
+        entityManager.flush();
         UserVO userVO = new UserVO();
         userVO.setId(userDO.getId());
         userVO.setName("张三");
         userVO.setAccount("zhangsan");
         String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
-        JSONAssert.assertEquals(listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), expectJsonResult, true);
+        JSONAssert.assertEquals(expectJsonResult, listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), true);
 
     }
 }

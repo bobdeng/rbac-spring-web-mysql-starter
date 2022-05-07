@@ -4,6 +4,8 @@ dependencies {
     testImplementation("org.assertj:assertj-core:$assertjVersion")
     testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
     testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'com.github.bobdeng:testtools:1.6'
+    testImplementation 'com.github.bobdeng:dummydao:1.2'
 }
 
 test {

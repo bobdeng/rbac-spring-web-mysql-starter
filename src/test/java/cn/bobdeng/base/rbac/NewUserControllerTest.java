@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.bobdeng.base.PermissionSessionUserGetter.TENANT_ID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -41,13 +42,14 @@ public class NewUserControllerTest extends IntegrationTest {
     UserPermissionSetter userPermissionSetter;
 
     @BeforeEach
-    public void setup() throws RoleAlreadyExistException {
-        userDAO.deleteAll();
-        userAccountDAO.deleteAll();
-        userRoleDAO.deleteAll();
-        roleDAO.deleteAll();
+    public void setup() {
         super.setup();
         super.setSessionUser();
+    }
+
+    @Override
+    protected List<String> tablesNeedClear() {
+        return List.of("rbac_user", "rbac_account", "rbac_user_role", "rbac_role");
     }
 
     @Test
@@ -61,10 +63,25 @@ public class NewUserControllerTest extends IntegrationTest {
                 ).andExpect(status().isOk()).andReturn()
                 .getResponse().getContentAsString(StandardCharsets.UTF_8);
         UserIdVO userId = new Gson().fromJson(result, UserIdVO.class);
-        List<UserDO> users = userDAO.findAllByTenantId(PermissionSessionUserGetter.TENANT_ID).collect(Collectors.toList());
+        List<UserDO> users = userDAO.findAllByTenantId(TENANT_ID).collect(Collectors.toList());
         assertThat(users.size(), is(2));
         UserDO savedUser = userDAO.findById(userId.getId()).orElseThrow();
         assertThat(savedUser.getName(), is("李四"));
+    }
+
+    @Test
+    public void should_fail_when_new_user_with_same_name() throws Exception {
+        super.setPermission("rbac.user.create");
+        userDAO.save(UserDO.builder().tenantId(TENANT_ID).name("李四").build());
+        NewUserForm form = new NewUserForm();
+        form.setName("李四");
+        String result = mockMvc.perform(post("/rbac/users")
+                        .content(new Gson().toJson(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().is4xxClientError()).andReturn()
+                .getResponse().getContentAsString(StandardCharsets.UTF_8);
+        assertThat(result, is("用户名已存在：李四"));
+
     }
 
     @Test

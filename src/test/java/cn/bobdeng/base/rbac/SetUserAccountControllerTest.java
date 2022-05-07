@@ -35,7 +35,7 @@ public class SetUserAccountControllerTest extends IntegrationTest {
     UserAccountDAO userAccountDAO;
 
     @BeforeEach
-    public void setup() throws RoleAlreadyExistException {
+    public void setup() {
         super.setup();
         super.setSessionUser();
     }

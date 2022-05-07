@@ -26,7 +26,7 @@ public class NewUserController {
     @ExceptionHandler(UserAlreadyExistException.class)
     public String onUserAlreadyExistException(UserAlreadyExistException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        return "用户名已存在:" + e.getName();
+        return "用户名已存在：" + e.getName();
     }
 
 }

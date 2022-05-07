@@ -1,0 +1,4 @@
+{
+  "name": "新角色",
+  "functions": ["rbac.user.create"]
+}

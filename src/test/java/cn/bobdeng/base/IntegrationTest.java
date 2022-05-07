@@ -18,9 +18,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +48,7 @@ public abstract class IntegrationTest {
     JdbcTemplate jdbcTemplate;
 
     @BeforeEach()
-    public void setup() throws RoleAlreadyExistException {
+    public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         this.tablesNeedClear().forEach(table -> {
             jdbcTemplate.execute("truncate table " + table);
@@ -64,8 +64,12 @@ public abstract class IntegrationTest {
         permissionSessionUserGetter.setSessionUser(new SessionUser(new UserId(admin.getId()), tenantId));
     }
 
-    protected void setPermission(String function) throws RoleAlreadyExistException {
-        userPermissionSetter.setPermission(function);
+    protected void setPermission(String function) {
+        try {
+            userPermissionSetter.setPermission(function);
+        } catch (RoleAlreadyExistException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected List<String> tablesNeedClear() {
