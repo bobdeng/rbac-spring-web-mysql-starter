@@ -1,5 +1,6 @@
 package cn.bobdeng.base.rbac.user;
 
+import cn.bobdeng.base.TenantId;
 import cn.bobdeng.base.user.*;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class SetPasswordService {
 
     @Permission("rbac.user.set_password")
     public void execute(UserId userId, Password password) {
-        userRepository.findById(userId)
+        userRepository.findById(userId, currentUser.tenantId())
                 .ifPresent(user -> user.setPassword(password, passwordRepository));
     }
 }

@@ -38,6 +38,6 @@ public class PermissionChecker {
         if (sessionUser == null) {
             throw new PermissionDeniedException();
         }
-        return userRepository.findById(sessionUser.getUserId()).orElseThrow(PermissionDeniedException::new);
+        return userRepository.findById(sessionUser.getUserId(),sessionUser.getTenantId()).orElseThrow(PermissionDeniedException::new);
     }
 }

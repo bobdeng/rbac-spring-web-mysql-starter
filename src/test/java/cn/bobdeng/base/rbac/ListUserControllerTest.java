@@ -8,7 +8,6 @@ import cn.bobdeng.base.rbac.repos.UserAccountDAO;
 import cn.bobdeng.base.rbac.repos.UserDAO;
 import cn.bobdeng.base.rbac.user.ListUserController;
 import cn.bobdeng.base.rbac.user.UserVO;
-import cn.bobdeng.base.role.RoleAlreadyExistException;
 import cn.bobdeng.base.user.AccountDO;
 import cn.bobdeng.base.user.UserDO;
 import cn.bobdeng.base.user.UserId;
@@ -18,11 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -62,6 +59,31 @@ public class ListUserControllerTest extends IntegrationTest {
 
     @Test
     public void should_return_users_when_has_has_1_user() throws Exception {
+        UserDO userDO = createUser();
+        String expectJsonResult = expectResult(userDO);
+        JSONAssert.assertEquals(expectJsonResult, listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), true);
+    }
+
+    @Test
+    public void should_return_users_when_has_has_1_user_match_keyword() throws Exception {
+        UserDO userDO = createUser();
+        String expectJsonResult = expectResult(userDO);
+        MvcResult mvcResult = mockMvc.perform(get("/rbac/users?keyword=张")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        JSONAssert.assertEquals(expectJsonResult, mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8), true);
+    }
+
+    private String expectResult(UserDO userDO) {
+        UserVO userVO = new UserVO();
+        userVO.setId(userDO.getId());
+        userVO.setName("张三");
+        userVO.setAccount("zhangsan");
+        String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
+        return expectJsonResult;
+    }
+
+    private UserDO createUser() {
         UserDO userDO = userDAO.save(UserDO.builder()
                 .tenantId(TENANT_ID)
                 .name("张三")
@@ -72,12 +94,6 @@ public class ListUserControllerTest extends IntegrationTest {
                 .name("zhangsan")
                 .build());
         entityManager.flush();
-        UserVO userVO = new UserVO();
-        userVO.setId(userDO.getId());
-        userVO.setName("张三");
-        userVO.setAccount("zhangsan");
-        String expectJsonResult = new Gson().toJson(Arrays.asList(userVO));
-        JSONAssert.assertEquals(expectJsonResult, listUser().getResponse().getContentAsString(StandardCharsets.UTF_8), true);
-
+        return userDO;
     }
 }

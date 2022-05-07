@@ -34,7 +34,7 @@ public class UserPermissionSetter {
         Role role = new Role(new RoleName(roleName), new RoleFunctions(functions));
         roles.saveRole(role, roleRepository);
         UserId userId = permissionSessionUserGetter.sessionUser().map(SessionUser::getUserId).orElse(null);
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId, tenantId).orElseThrow();
         user.setRoles(Arrays.asList(roleName), userRoleRepository);
 
     }

@@ -10,4 +10,5 @@ public interface UserDAO extends CrudRepository<UserDO, Integer> {
     Optional<UserDO> findAllByTenantIdAndName(String tenantId, String name);
 
     Stream<UserDO> findAllByTenantId(String tenantId);
+    Optional<UserDO> findByTenantIdAndId(String tenantId,int id);
 }

@@ -23,8 +23,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UserId id) {
-        return userDAO.findById(id.id()).map(User::new);
+    public Optional<User> findById(UserId id, TenantId tenantId) {
+        return userDAO.findByTenantIdAndId(tenantId.id(), id.id()).map(User::new);
     }
 
     @Override
